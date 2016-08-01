@@ -29,15 +29,15 @@ THE SOFTWARE.
 using namespace cv;
 using namespace std;
 
-#define MAX_FRAME 1000
+#define MAX_FRAME 4544
 #define MIN_NUM_FEAT 2000
 
 // IMP: Change the file directories (4 places) according to where your dataset is saved before running!
 
-std::vector<cv::Point3_<double >> readTurePose(){
+std::vector<cv::Point3_<double> > readTurePose(){
     std::string line;
     std::ifstream posefile("/home/platonev/DataSets/pose.txt");
-    std::vector<cv::Point3_<double >> points;
+    std::vector<cv::Point3_<double> > points;
     double x = 0, y = 0, z = 0;
     if(posefile.is_open()){
         while(std::getline(posefile, line)){
@@ -96,6 +96,8 @@ int main(int argc, char** argv){
 
     ofstream myfile;
     myfile.open("results1_1.txt");
+
+    std::vector<cv::Point3_<double> > poses = readTurePose();
 
     double scale = 1.00;
     char filename1[200];
@@ -206,7 +208,9 @@ int main(int argc, char** argv){
 
         int x = int(t_f.at<double>(0)) + 300;
         int y = int(t_f.at<double>(2)) + 100;
-        circle(traj, Point(x, y), 1, CV_RGB(255, 0, 0), 2);
+        circle(traj, Point(x, 600 - y), 1, CV_RGB(255, 0, 0), 2);
+        circle(traj, Point(poses[numFrame].x - poses[0].x + 300, 600 - poses[numFrame].z + poses[0].z), 1,
+               CV_RGB(0, 255, 0), 2);
 
         rectangle(traj, Point(10, 30), Point(550, 50), CV_RGB(0, 0, 0), CV_FILLED);
         sprintf(text, "Coordinates: x = %02fm y = %02fm z = %02fm", t_f.at<double>(0), t_f.at<double>(1),
