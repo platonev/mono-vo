@@ -207,7 +207,7 @@ int main(int argc, char** argv){
         prevFeatures = currFeatures;
 
         int x = int(t_f.at<double>(0)) + 300;
-        int y = int(t_f.at<double>(2)) + 100;
+        int y = int(t_f.at<double>(2));
         circle(traj, Point(x, 600 - y), 1, CV_RGB(255, 0, 0), 2);
         circle(traj, Point(poses[numFrame].x - poses[0].x + 300, 600 - poses[numFrame].z + poses[0].z), 1,
                CV_RGB(0, 255, 0), 2);
