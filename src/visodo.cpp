@@ -24,7 +24,10 @@ THE SOFTWARE.
 
 */
 
-#include "mvo/vo_features.h"
+#include "mvo/feature.h"
+#include <iterator> // for ostream_iterator
+#include <ctime>
+#include <fstream>
 
 using namespace cv;
 using namespace std;
@@ -79,9 +82,7 @@ double getAbsoluteScale(int frame_id, int sequence_id, double z_cal){
             i++;
         }
         myfile.close();
-    }
-
-    else{
+    }else{
         cout << "Unable to open file";
         return 0;
     }
@@ -93,9 +94,6 @@ int main(int argc, char** argv){
 
     Mat img_1, img_2;
     Mat R_f, t_f; //the final rotation and tranlation vectors containing the
-
-    ofstream myfile;
-    myfile.open("results1_1.txt");
 
     std::vector<cv::Point3_<double> > poses = readTurePose();
 
@@ -126,9 +124,9 @@ int main(int argc, char** argv){
 
     // feature detection, tracking
     vector<Point2f> points1, points2;        //vectors to store the coordinates of the feature points
-    featureDetection(img_1, points1);        //detect features in img_1
+    mvo::featureDetection(img_1, points1);        //detect features in img_1
     vector<uchar> status;
-    featureTracking(img_1, img_2, points1, points2, status); //track those features to img_2
+    mvo::featureTracking(img_1, img_2, points1, points2, status); //track those features to img_2
 
     //TODO: add a fucntion to load these values directly from KITTI's calib files
     // WARNING: different sequences in the KITTI VO dataset have different intrinsic/extrinsic parameters
@@ -162,7 +160,7 @@ int main(int argc, char** argv){
         Mat currImage_c = imread(filename);
         cvtColor(currImage_c, currImage, COLOR_BGR2GRAY);
         vector<uchar> status;
-        featureTracking(prevImage, currImage, prevFeatures, currFeatures, status);
+        mvo::featureTracking(prevImage, currImage, prevFeatures, currFeatures, status);
 
         E = findEssentialMat(currFeatures, prevFeatures, focal, pp, RANSAC, 0.999, 1.0, mask);
         recoverPose(E, currFeatures, prevFeatures, R, t, focal, pp, mask);
@@ -186,21 +184,16 @@ int main(int argc, char** argv){
 
             t_f = t_f + scale * (R_f * t);
             R_f = R * R_f;
-        }
-
-        else{
+        }else{
             //cout << "scale below 0.1, or incorrect translation" << endl;
         }
-
-        // lines for printing results
-        // myfile << t_f.at<double>(0) << " " << t_f.at<double>(1) << " " << t_f.at<double>(2) << endl;
 
         // a redetection is triggered in case the number of feautres being trakced go below a particular threshold
         if(prevFeatures.size() < MIN_NUM_FEAT){
             //cout << "Number of tracked features reduced to " << prevFeatures.size() << endl;
             //cout << "trigerring redection" << endl;
-            featureDetection(prevImage, prevFeatures);
-            featureTracking(prevImage, currImage, prevFeatures, currFeatures, status);
+            mvo::featureDetection(prevImage, prevFeatures);
+            mvo::featureTracking(prevImage, currImage, prevFeatures, currFeatures, status);
         }
 
         prevImage = currImage.clone();
