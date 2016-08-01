@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 */
 
-#include "vo_features.h"
+#include "mvo/vo_features.h"
 
 using namespace cv;
 using namespace std;
