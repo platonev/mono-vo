@@ -34,6 +34,28 @@ using namespace std;
 
 // IMP: Change the file directories (4 places) according to where your dataset is saved before running!
 
+std::vector<cv::Point3_<double >> readTurePose() {
+    std::string line;
+    std::ifstream posefile("/home/platonev/DataSets/pose.txt");
+    std::vector<cv::Point3_<double >> points;
+    double x = 0, y = 0, z = 0;
+    if (posefile.is_open()) {
+        while (std::getline(posefile, line)) {
+            std::istringstream in(line);
+            for (int j = 0; j < 12; j++) {
+                in >> z;
+                if (j == 7) y = z;
+                if (j == 3) x = z;
+            }
+
+            points.push_back(cv::Point3_<double>(x, y, z));
+        }
+        posefile.close();
+    }
+
+    return points;
+}
+
 double getAbsoluteScale(int frame_id, int sequence_id, double z_cal) {
 
     string line;
