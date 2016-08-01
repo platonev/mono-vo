@@ -34,18 +34,18 @@ using namespace std;
 
 // IMP: Change the file directories (4 places) according to where your dataset is saved before running!
 
-std::vector<cv::Point3_<double >> readTurePose() {
+std::vector<cv::Point3_<double >> readTurePose(){
     std::string line;
     std::ifstream posefile("/home/platonev/DataSets/pose.txt");
     std::vector<cv::Point3_<double >> points;
     double x = 0, y = 0, z = 0;
-    if (posefile.is_open()) {
-        while (std::getline(posefile, line)) {
+    if(posefile.is_open()){
+        while(std::getline(posefile, line)){
             std::istringstream in(line);
-            for (int j = 0; j < 12; j++) {
+            for(int j = 0; j < 12; j++){
                 in >> z;
-                if (j == 7) y = z;
-                if (j == 3) x = z;
+                if(j == 7) y = z;
+                if(j == 3) x = z;
             }
 
             points.push_back(cv::Point3_<double>(x, y, z));
@@ -56,24 +56,24 @@ std::vector<cv::Point3_<double >> readTurePose() {
     return points;
 }
 
-double getAbsoluteScale(int frame_id, int sequence_id, double z_cal) {
+double getAbsoluteScale(int frame_id, int sequence_id, double z_cal){
 
     string line;
     int i = 0;
     ifstream myfile("/home/platonev/DataSets/pose.txt");
     double x = 0, y = 0, z = 0;
     double x_prev, y_prev, z_prev;
-    if (myfile.is_open()) {
-        while ((getline(myfile, line)) && (i <= frame_id)) {
+    if(myfile.is_open()){
+        while((getline(myfile, line)) && (i <= frame_id)){
             z_prev = z;
             x_prev = x;
             y_prev = y;
             std::istringstream in(line);
             //cout << line << '\n';
-            for (int j = 0; j < 12; j++) {
+            for(int j = 0; j < 12; j++){
                 in >> z;
-                if (j == 7) y = z;
-                if (j == 3) x = z;
+                if(j == 7) y = z;
+                if(j == 3) x = z;
             }
 
             i++;
@@ -81,7 +81,7 @@ double getAbsoluteScale(int frame_id, int sequence_id, double z_cal) {
         myfile.close();
     }
 
-    else {
+    else{
         cout << "Unable to open file";
         return 0;
     }
@@ -89,7 +89,7 @@ double getAbsoluteScale(int frame_id, int sequence_id, double z_cal) {
     return sqrt((x - x_prev) * (x - x_prev) + (y - y_prev) * (y - y_prev) + (z - z_prev) * (z - z_prev));
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv){
 
     Mat img_1, img_2;
     Mat R_f, t_f; //the final rotation and tranlation vectors containing the
@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
     Mat img_1_c = imread(filename1);
     Mat img_2_c = imread(filename2);
 
-    if (!img_1_c.data || !img_2_c.data) {
+    if(!img_1_c.data || !img_2_c.data){
         std::cout << " --(!) Error reading images " << std::endl;
         return -1;
     }
@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
 
     Mat traj = Mat::zeros(600, 600, CV_8UC3);
 
-    for (int numFrame = 2; numFrame < MAX_FRAME; numFrame++) {
+    for(int numFrame = 2; numFrame < MAX_FRAME; numFrame++){
         sprintf(filename, "/home/platonev/DataSets/image_0/%06d.png", numFrame);
         //cout << numFrame << endl;
         Mat currImage_c = imread(filename);
@@ -167,8 +167,8 @@ int main(int argc, char** argv) {
 
         Mat prevPts(2, prevFeatures.size(), CV_64F), currPts(2, currFeatures.size(), CV_64F);
 
-        for (int i = 0; i <
-                        prevFeatures.size(); i++) {   //this (x,y) combination makes sense as observed from the source code of triangulatePoints on GitHub
+        for(int i = 0; i <
+                       prevFeatures.size(); i++){   //this (x,y) combination makes sense as observed from the source code of triangulatePoints on GitHub
             prevPts.at<double>(0, i) = prevFeatures.at(i).x;
             prevPts.at<double>(1, i) = prevFeatures.at(i).y;
 
@@ -180,13 +180,13 @@ int main(int argc, char** argv) {
 
         //cout << "Scale is " << scale << endl;
 
-        if ((scale > 0.1) && (t.at<double>(2) > t.at<double>(0)) && (t.at<double>(2) > t.at<double>(1))) {
+        if((scale > 0.1) && (t.at<double>(2) > t.at<double>(0)) && (t.at<double>(2) > t.at<double>(1))){
 
             t_f = t_f + scale * (R_f * t);
             R_f = R * R_f;
         }
 
-        else {
+        else{
             //cout << "scale below 0.1, or incorrect translation" << endl;
         }
 
@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
         // myfile << t_f.at<double>(0) << " " << t_f.at<double>(1) << " " << t_f.at<double>(2) << endl;
 
         // a redetection is triggered in case the number of feautres being trakced go below a particular threshold
-        if (prevFeatures.size() < MIN_NUM_FEAT) {
+        if(prevFeatures.size() < MIN_NUM_FEAT){
             //cout << "Number of tracked features reduced to " << prevFeatures.size() << endl;
             //cout << "trigerring redection" << endl;
             featureDetection(prevImage, prevFeatures);
