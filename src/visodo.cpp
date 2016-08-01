@@ -59,35 +59,10 @@ std::vector<cv::Point3_<double> > readTurePose(){
     return points;
 }
 
-double getAbsoluteScale(int frame_id, int sequence_id, double z_cal){
+double getAbsoluteScale(cv::Point3_<double> current, cv::Point3_<double> pre){
 
-    string line;
-    int i = 0;
-    ifstream myfile("/home/platonev/DataSets/pose.txt");
-    double x = 0, y = 0, z = 0;
-    double x_prev, y_prev, z_prev;
-    if(myfile.is_open()){
-        while((getline(myfile, line)) && (i <= frame_id)){
-            z_prev = z;
-            x_prev = x;
-            y_prev = y;
-            std::istringstream in(line);
-            //cout << line << '\n';
-            for(int j = 0; j < 12; j++){
-                in >> z;
-                if(j == 7) y = z;
-                if(j == 3) x = z;
-            }
-
-            i++;
-        }
-        myfile.close();
-    }else{
-        cout << "Unable to open file";
-        return 0;
-    }
-
-    return sqrt((x - x_prev) * (x - x_prev) + (y - y_prev) * (y - y_prev) + (z - z_prev) * (z - z_prev));
+    return sqrt((current.x - pre.x) * (current.x - pre.x) + (current.y - pre.y) * (current.y - pre.y) +
+                (current.z - pre.z) * (current.z - pre.z));
 }
 
 int main(int argc, char** argv){
@@ -176,7 +151,7 @@ int main(int argc, char** argv){
             currPts.at<double>(1, i) = currFeatures.at(i).y;
         }
 
-        scale = getAbsoluteScale(numFrame, 0, t.at<double>(2));
+        scale = getAbsoluteScale(poses[numFrame], poses[numFrame - 1]);
 
         //cout << "Scale is " << scale << endl;
 
