@@ -38,7 +38,7 @@ double getAbsoluteScale(int frame_id, int sequence_id, double z_cal) {
 
     string line;
     int i = 0;
-    ifstream myfile("/home/avisingh/Datasets/KITTI_VO/00.txt");
+    ifstream myfile("/home/platonev/DataSets/pose.txt");
     double x = 0, y = 0, z = 0;
     double x_prev, y_prev, z_prev;
     if (myfile.is_open()) {
@@ -78,8 +78,8 @@ int main(int argc, char** argv) {
     double scale = 1.00;
     char filename1[200];
     char filename2[200];
-    sprintf(filename1, "/home/avisingh/Datasets/KITTI_VO/00/image_2/%06d.png", 0);
-    sprintf(filename2, "/home/avisingh/Datasets/KITTI_VO/00/image_2/%06d.png", 1);
+    sprintf(filename1, "/home/platonev/DataSets/image_0/%06d.png", 0);
+    sprintf(filename2, "/home/platonev/DataSets/image_0/%06d.png", 1);
 
     char text[100];
     int fontFace = FONT_HERSHEY_PLAIN;
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
     Mat traj = Mat::zeros(600, 600, CV_8UC3);
 
     for (int numFrame = 2; numFrame < MAX_FRAME; numFrame++) {
-        sprintf(filename, "/home/avisingh/Datasets/KITTI_VO/00/image_2/%06d.png", numFrame);
+        sprintf(filename, "/home/platonev/DataSets/image_0/%06d.png", numFrame);
         //cout << numFrame << endl;
         Mat currImage_c = imread(filename);
         cvtColor(currImage_c, currImage, COLOR_BGR2GRAY);
